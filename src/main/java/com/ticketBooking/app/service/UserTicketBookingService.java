@@ -1,6 +1,7 @@
 package com.ticketBooking.app.service;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+
+import com.ticketBooking.app.entities.Ticket;
 import com.ticketBooking.app.entities.Train;
 import com.ticketBooking.app.entities.User;
 import com.ticketBooking.app.utils.UserServiceUtil;
@@ -29,6 +30,7 @@ public class UserTicketBookingService {
     }
 
     public UserTicketBookingService() throws IOException {
+
         loadUserListFromFile();
     }
 
@@ -55,10 +57,21 @@ public class UserTicketBookingService {
     }
 
     public void fetchBookings(){
+        if(user.getName().isEmpty() || user.getName() == null){
+            System.out.println("please login first");
+        }
         Optional<User> userFound = userList.stream().filter(user1 -> user1.getName().equals(user.getName()) && UserServiceUtil.checkPassword(user.getPassword(), user1.getHashedPassword())).findFirst();
         if(userFound.isPresent()){
-            userFound.get().printTickets();
+            List<Ticket> ticketsBooked = userFound.get().getTicketsBooked();
+            if(ticketsBooked.isEmpty()){
+                System.out.println("No tickets Booked");
+            }
+            else{
+                userFound.get().printTickets();
+            }
         }
+
+
     }
 
     public Boolean cancelBooking(String ticketId){
@@ -82,13 +95,16 @@ public class UserTicketBookingService {
         }
     }
 
-//    public List<Train> getTrains(String source, String destination){
-//        try{
-//            return trainService.searchTrains(source, destination);
-//        }catch(IOException ex){
-//            return new ArrayList<>();
-//        }
-//    }
+    public List<Train> getTrains(String source, String destination){
+        try{
+            System.out.println("Inside getTrains...");
+            TrainService trainService = new TrainService();
+            return trainService.searchTrains(source, destination);
+        }catch(IOException ex){
+            System.out.println("catched exmeption");
+            return new ArrayList<>();
+        }
+    }
 
     public List<List<Integer>> fetchSeats(Train train){
         return train.getSeats();

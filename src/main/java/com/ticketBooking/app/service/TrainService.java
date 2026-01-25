@@ -5,9 +5,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
-import java.io.IOError;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -23,15 +21,23 @@ public class TrainService {
     public TrainService() throws IOException{
         File trains = new File(TRAIN_DB_PATH);
         trainList = objectMapper.readValue(trains, new TypeReference<List<Train>>() {});
+        for(int i=0; i<trainList.size();i++){
+            System.out.println(trainList.get(i).getTrainId());
+        }
 
     }
 
     public List<Train> searchTrains(String source, String destination){
-        return trainList.stream().filter(train -> validateTrain(train, source, destination)).collect(Collectors.toList());
+        System.out.println("Inside searchTrains...");
+        List<Train> list = trainList.stream().filter(train -> validateTrain(train, source, destination)).collect(Collectors.toList());
+        System.out.println(list);
+        return list;
     }
 
     private boolean validateTrain(Train train, String source, String destination){
+        System.out.println("Inside validateTrain..");
         List<String> stationsOrder = train.getStations();
+        System.out.println(stationsOrder);
 
         int sourceIndex = stationsOrder.indexOf(source.toLowerCase());
         int destinationIndex = stationsOrder.indexOf(destination.toLowerCase());
